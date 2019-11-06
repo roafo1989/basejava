@@ -1,8 +1,3 @@
-import com.sun.deploy.util.ArrayUtil;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Array based storage for Resumes
@@ -11,7 +6,11 @@ public class ArrayStorage {
     Resume[] storage = new Resume[10000];
 
     void clear() {
-        for(int i = 0; i < storage.length; i++) storage[i] = null;
+        for(int i = 0; i < storage.length; i++) {
+            if(storage[i] != null){
+                storage[i] = null;
+            } else return;
+        }
     }
 
     void save(Resume r) {
@@ -24,31 +23,45 @@ public class ArrayStorage {
     }
 
     Resume get(String uuid) {
-        Resume r = null;
-        for (Resume resume : storage) {
-            if (resume.uuid.equals(uuid)) r = resume;
-            break;
+        int i = 0;
+        while (storage[i] != null){
+            if(storage[i].uuid.equals(uuid)){
+                return storage[i];
+            }
+            i++;
         }
-        return r;
+        return null;
     }
 
     void delete(String uuid) {
-       for(int i = 0; i < storage.length; i++){
-           if(storage[i].uuid.equals(uuid)) {
-               for(int k = i; k < storage.length; k++){
-                   if(storage[k] != null){
-                       storage[k] = storage[k+1];
-                   } else return;
-               }
-           }
-       }
+        int k = 0;
+        while (storage[k] != null){
+            if(storage[k].uuid.equals(uuid)){
+                int i = k;
+                while (storage[i] != null){
+                    storage[i] = storage[i+1];
+                    i++;
+                }
+                return;
+            }
+            k++;
+        }
     }
 
     /**
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        return storage;
+        int lenght = 0;
+        for(int i = 0; i < storage.length; i++){
+            if(storage[i]==null){
+                lenght = i;
+                break;
+            }
+        }
+        Resume[] resumes = new Resume[lenght];
+        System.arraycopy(storage, 0, resumes, 0, resumes.length);
+        return resumes;
     }
 
     int size() {
